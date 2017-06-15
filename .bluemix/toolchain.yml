@@ -26,10 +26,10 @@ service_pipeline:
   parameters:
     services:
       - service_github
-    name: pipeline
+    name: pipeline1
     configuration:
       content:
-        $text: pipeline.yml
+        $text: pipeline1.yml
       env:        
         SERVICE_API_REPO: service_github
         PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
