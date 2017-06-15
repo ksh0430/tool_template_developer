@@ -1,0 +1,48 @@
+---
+name: "Toolchain Template for Developers"
+description: "Toolchain Template for Developers"
+version: '0.1'
+
+# GitHub
+service_github:
+  service_id: githubpublic
+  parameters:
+    repo_name: spring-petclinic-microservices
+    repo_url: https://github.com/sdevopsadm/spring-petclinic-microservices
+    type: clone
+    has_issues: true
+
+# Orion Web IDE
+service_orion:
+  parameters:
+    container_url: ""
+    dashboard_url: ""
+    toolchain_id: ""
+  service_id: orion
+
+# pipelines
+service_pipeline_api_gateway:
+  service_id: pipeline
+  parameters:
+    services:
+      - service_github
+    name: pipeline-api-gateway
+    configuration:
+      content:
+        $text: pipeline-api-gateway.yml
+      env:
+        LOGICAL_APP_NAME: API Gateway
+        SERVICE_API_REPO: service_github
+        PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
+        PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
+        PROD_REGION_ID: "{{deploy.parameters.prod-region}}"
+    execute: true
+
+#Deployment
+deploy:
+  #schema: deploy.json
+  service-category: pipeline
+  parameters:
+    prod-region: "{{region}}"
+    prod-organization: "{{organization}}"
+    prod-space: POC
