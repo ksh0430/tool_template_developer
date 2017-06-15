@@ -1,0 +1,77 @@
+---
+stages:
+- name: Build
+  inputs:
+  - type: git
+    branch: master
+    service: ${SERVICE_API_REPO}
+  triggers:
+  - type: commit
+  properties:
+  jobs:
+  - name: Package
+    type: builder
+    working_dir: 
+    artifact_dir: target
+    build_type: maven
+    script: |-
+      #!/bin/bash
+      export JAVA_HOME=$JAVA8_HOME
+      
+      mvn -B package
+
+- name: Test
+  inputs:
+  - type: job
+    stage: Build
+    job: Package
+    dir_name: null
+  triggers:
+  - type: stage
+  jobs:
+  - name: Static Analystics
+    type: tester
+    script: |-
+      #!/bin/bash
+
+      CLASS=org.springframework.samples.petclinic
+      TARGET=spring-petclinic-api-gateway-1.5.2.jar
+
+      git clone https://github.com/jgkong/findbugs_extension.git
+
+      export JAVA_HOME=$JAVA8_HOME
+      export PATH=$JAVA_HOME/bin:$PATH
+
+      export EXT_DIR=$(pwd)/findbugs_extension
+
+      FINDBUGS_TGZ=$EXT_DIR/lib/findbugs-noUpdateChecks-3.0.1.tar.gz
+      FINDBUGS_PREFIX='findbugs'
+      FINDBUGS_XML='findbugs_report.xml'
+      mkdir -p $FINDBUGS_PREFIX
+      tar xz -C $FINDBUGS_PREFIX -f $FINDBUGS_TGZ
+      FINDBUGS_DIR=$(pwd)/$(ls -d $FINDBUGS_PREFIX/findbugs*)
+
+      $FINDBUGS_DIR/bin/findbugs -xml:withMessages -output $FINDBUGS_XML -onlyAnalyze ${CLASS}.- ${TARGET}
+      mkdir -p tests
+      python $EXT_DIR/findbug_to_junit.py $FINDBUGS_XML tests/TEST-findbugs.xml
+    enable_tests: true
+    test_file_pattern: tests/TEST-*.xml
+- name: Deploy DEV to Bluemix CF
+  inputs:
+  - type: job
+    stage: Build
+    job: Package
+    dir_name: null
+  triggers:
+  - type: stage
+  jobs:
+  - name: Deploy
+    type: deployer
+    target:
+      region_id: ${PROD_REGION_ID}
+      organization: ${PROD_ORG_NAME}
+      space: ${PROD_SPACE_NAME}
+      application: "CF-App-spring-petclinic-api-gateway"
+    script: |-
+      #!/bin/bash
+      cf push "${CF_APP}" -p spring-petclinic-*.jar
