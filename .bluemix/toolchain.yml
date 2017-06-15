@@ -21,15 +21,15 @@ service_orion:
   service_id: orion
 
 # pipelines
-service_pipeline_api_gateway:
+service_pipeline:
   service_id: pipeline
   parameters:
     services:
       - service_github
-    name: pipeline-api-gateway
+    name: pipeline
     configuration:
       content:
-        $text: pipeline-api-gateway.yml
+        $text: pipeline.yml
       env:
         LOGICAL_APP_NAME: API Gateway
         SERVICE_API_REPO: service_github
