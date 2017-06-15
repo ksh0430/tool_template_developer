@@ -30,8 +30,7 @@ service_pipeline:
     configuration:
       content:
         $text: pipeline.yml
-      env:
-        LOGICAL_APP_NAME: API Gateway
+      env:        
         SERVICE_API_REPO: service_github
         PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
         PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
