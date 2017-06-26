@@ -150,3 +150,5 @@ stages:
   - name: APP_URL
     type: text
     value: http://api-gateway-sp.mybluemix.net/#!/welcome
+  triggers:
+  - type: stage
