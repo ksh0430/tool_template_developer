@@ -1,8 +1,3 @@
-hooks:
-- enabled: true
-  label: null
-  ssl_enabled: false
-  url: https://devops-api.ng.bluemix.net/v1/messaging/webhook/publish
 stages:
 - inputs:
   - branch: master
