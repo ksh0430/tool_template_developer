@@ -4,7 +4,7 @@ deploy:
     prod-region: '{{region}}'
     prod-space: '{{space}}'
   service-category: pipeline
-description: PoC2_petclinic_microservice_developer
+description: PoC2_petclinic_microservice_developer1
 name: PoC2_petclinic_microservice_developer
 service_apm:
   parameters: {}
