@@ -13,28 +13,6 @@ service_apm:
 service_draservicebroker:
   parameters: {}
   service_id: draservicebroker
-service_github_roadmap:
-  parameters:
-    api_root_url: https://api.github.com
-    enable_traceability: false
-    extra_capabilities:
-    - capability_id: git.issues
-      dashboard_url: https://github.com/sdevopsadm/roadmap/issues
-      display_name: Issues
-      enabled: true
-      label: roadmap
-      tags:
-      - think
-      - code
-    has_issues: true
-    label: roadmap
-    owner_id: sdevopsadm
-    private_repo: true
-    repo_name: roadmap
-    repo_url: https://github.com/sdevopsadm/roadmap.git
-    token_url: https://otc-github-consolidated-broker.ng.bluemix.net/github/token?git_id=github
-    type: link
-  service_id: githubpublic
 service_github_spring-petclinic-microservices:
   parameters:
     api_root_url: https://api.github.com
@@ -78,7 +56,4 @@ service_pipeline_PoC2-api-gateway-jgkong:
 service_saucelabs:
   parameters: {}
   service_id: saucelabs
-service_slack:
-  parameters: {}
-  service_id: slack
 version: '0.1'
