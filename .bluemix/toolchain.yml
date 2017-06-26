@@ -50,57 +50,9 @@ service_pipeline_api_gateway:
     name: pipeline-api-gateway
     configuration:
       content:
-        $text: pipeline-api-gateway.yml
+        $text: pipeline_developer.yml
       env:
         LOGICAL_APP_NAME: API Gateway
-        SERVICE_API_REPO: service_github
-        PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
-        PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
-        PROD_REGION_ID: "{{deploy.parameters.prod-region}}"
-    execute: true
-service_pipeline_customers_service:
-  service_id: pipeline
-  parameters:
-    services:
-      - service_github
-    name: pipeline-customers-service
-    configuration:
-      content:
-        $text: pipeline-customers-service.yml
-      env:
-        LOGICAL_APP_NAME: Customers Service
-        SERVICE_API_REPO: service_github
-        PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
-        PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
-        PROD_REGION_ID: "{{deploy.parameters.prod-region}}"
-    execute: true
-service_pipeline_vets_service:
-  service_id: pipeline
-  parameters:
-    services:
-      - service_github
-    name: pipeline-vets-service
-    configuration:
-      content:
-        $text: pipeline-vets-service.yml
-      env:
-        LOGICAL_APP_NAME: Vets Service
-        SERVICE_API_REPO: service_github
-        PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
-        PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
-        PROD_REGION_ID: "{{deploy.parameters.prod-region}}"
-    execute: true
-service_pipeline_visits_service:
-  service_id: pipeline
-  parameters:
-    services:
-      - service_github
-    name: pipeline-visits-service
-    configuration:
-      content:
-        $text: pipeline-visits-service.yml
-      env:
-        LOGICAL_APP_NAME: Visits Service
         SERVICE_API_REPO: service_github
         PROD_SPACE_NAME: "{{deploy.parameters.prod-space}}"
         PROD_ORG_NAME: "{{deploy.parameters.prod-organization}}"
