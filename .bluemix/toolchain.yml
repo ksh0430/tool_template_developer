@@ -46,7 +46,7 @@ service_pipeline_PoC2-api-gateway-jgkong:
       content:
         $text: pipeline_developer.yml
       env: 
-        SERVICE_API_REPO: service_github      
+        SERVICE_API_REPO: service_github_spring-petclinic-microservices      
     name: PoC2-api-gateway-jgkong
     services:
     - service_github_spring-petclinic-microservices
