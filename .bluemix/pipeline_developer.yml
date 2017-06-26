@@ -2,7 +2,7 @@ stages:
 - inputs:
   - branch: master
     dir_name: null
-    service: service_github_spring-petclinic-microservices
+    service: ${SERVICE_API_REPO}
     type: git
   jobs:
   - artifact_dir: target
