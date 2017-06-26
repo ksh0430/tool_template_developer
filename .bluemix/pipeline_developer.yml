@@ -1,8 +1,13 @@
+hooks:
+- enabled: true
+  label: null
+  ssl_enabled: false
+  url: https://devops-api.ng.bluemix.net/v1/messaging/webhook/publish
 stages:
 - inputs:
   - branch: master
     dir_name: null
-    service: ${SERVICE_API_REPO}
+    service: service_github_spring-petclinic-microservices
     type: git
   jobs:
   - artifact_dir: target
