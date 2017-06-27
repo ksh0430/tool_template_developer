@@ -1,0 +1,161 @@
+hooks:
+- enabled: true
+  label: null
+  ssl_enabled: false
+  url: https://devops-api.ng.bluemix.net/v1/messaging/webhook/publish
+stages:
+- inputs:
+  - branch: master
+    dir_name: null
+    service: service_github_spring-petclinic-microservices
+    type: git
+  jobs:
+  - artifact_dir: target
+    build_type: maven
+    name: Package-api-gateway
+    script: '#!/bin/bash
+
+
+      export JAVA_HOME=$JAVA8_HOME
+
+      mvn -B package
+
+
+      cp ./src/main/docker/Dockerfile $ARCHIVE_DIR/
+
+      cp ./src/test/resources/sample.js $ARCHIVE_DIR/
+
+      '
+    type: builder
+    working_dir: spring-petclinic-api-gateway
+  name: Build
+  triggers:
+  - type: commit
+- inputs:
+  - dir_name: null
+    job: Package-api-gateway
+    stage: Build
+    type: job
+  jobs:
+  - ADDITIONAL_LIFE_CYCLE_STAGE_SELECT: none
+    COMMAND: '#!/bin/bash'
+    LIFE_CYCLE_STAGE_SELECT: unittest
+    LOG_FILE: surefire-reports/TEST-*.xml
+    enable_tests: true
+    extension_id: ibm.devops.services.pipeline.dra_upload_results
+    name: Unit test
+    test_file_pattern: surefire-reports/TEST-*.xml
+    type: tester
+  - CRITERIA: Staging
+    ENVIRONMENT: STAGING
+    enable_tests: true
+    extension_id: ibm.devops.services.pipeline.dra_devops_gate
+    name: Unit test Gate
+    test_file_pattern: tests/TEST-*.xml
+    type: tester
+  - enable_tests: true
+    name: Static Analysis
+    script: '#!/bin/bash
+
+
+      CLASS=org.springframework.samples.petclinic
+
+      TARGET=spring-petclinic-api-gateway-1.5.2.war
+
+
+      git clone https://github.com/jgkong/findbugs_extension.git
+
+
+      export JAVA_HOME=$JAVA8_HOME
+
+      export PATH=$JAVA_HOME/bin:$PATH
+
+
+      export EXT_DIR=$(pwd)/findbugs_extension
+
+
+      FINDBUGS_TGZ=$EXT_DIR/lib/findbugs-noUpdateChecks-3.0.1.tar.gz
+
+      FINDBUGS_PREFIX=''findbugs''
+
+      FINDBUGS_XML=''findbugs_report.xml''
+
+      mkdir -p $FINDBUGS_PREFIX
+
+      tar xz -C $FINDBUGS_PREFIX -f $FINDBUGS_TGZ
+
+      FINDBUGS_DIR=$(pwd)/$(ls -d $FINDBUGS_PREFIX/findbugs*)
+
+
+      $FINDBUGS_DIR/bin/findbugs -xml:withMessages -output $FINDBUGS_XML -onlyAnalyze
+      ${CLASS}.- ${TARGET}
+
+      mkdir -p tests
+
+      python $EXT_DIR/findbug_to_junit.py $FINDBUGS_XML tests/TEST-findbugs.xml'
+    test_file_pattern: tests/TEST-*.xml
+    type: tester
+  name: Test
+  properties:
+  - name: LOGICAL_ENV_NAME
+    type: text
+    value: STAGING
+  - name: LOGICAL_APP_NAME
+    type: text
+    value: api-gateway
+  triggers:
+  - type: stage
+- inputs:
+  - dir_name: null
+    job: Package-api-gateway
+    stage: Build
+    type: job
+  jobs:
+  - name: Deploy
+    script: '#!/bin/bash
+
+      cf push "${CF_APP}" -p spring-petclinic-api-gateway-1.5.2.war
+
+      '
+    target:
+      application: PoC2-api-gateway-developer
+      organization: VDInfraPOC
+      region_id: ibm:yp:us-south
+      space: dev
+    type: deployer
+  - ACCESS: abcd
+    COMMAND: '#!/bin/bash
+
+      node -v
+
+
+      export PATH=/opt/IBM/node-v6.7.0/bin:$PATH
+
+
+      node -v
+
+      npm install selenium-webdriver
+
+      node sample.js'
+    DL_ASSETS: 'true'
+    SELECT_CMD: custom
+    USER_ID: sdevopsadm
+    enable_tests: true
+    extension_id: ibm.devops.services.pipeline.saucelabs
+    name: UX Test
+    target:
+      organization: VDInfraPOC
+      space: POC
+      url: https://api.ng.bluemix.net
+    test_file_pattern: tests/TEST-*.xml
+    type: tester
+  name: 'DEV: Deploy to Bluemix CF'
+  properties:
+  - name: LOGICAL_ENV_NAME
+    type: text
+    value: DEV
+  - name: APP_URL
+    type: text
+    value: http://poc2-api-gateway-developer.mybluemix.net/#!/welcome
+  triggers:
+  - type: stage
