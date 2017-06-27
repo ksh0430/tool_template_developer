@@ -114,7 +114,7 @@ stages:
       application: PoC2-api-gateway-jgkong
       organization: VDInfraPOC
       region_id: ibm:yp:us-south
-      space: POC
+      space: dev
     type: deployer
   - ACCESS: abcd
     COMMAND: '#!/bin/bash
